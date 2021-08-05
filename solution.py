@@ -14,7 +14,7 @@ class FlightSearch:
         self.setup()
         self.fetch_flights()
         self.find_flight(self.origin_airport, self.destination_airport)
-        print(self.selected_flights)
+        pprint(self.selected_flights)
 
     def setup(self):
         print("[Flight Search] Enter flight details.")
