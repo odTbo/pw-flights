@@ -50,12 +50,14 @@ class FlightSearch:
                 flights.append(flight)
 
         for flight in flights:
+            # Single flight option
             if flight["destination"] == self.destination_airport:
                 self.selected_flights.append(
                     {"flights": flight}
                 )
+            # Flights with layovers
             else:
-                #Get next possible flight
+                # flight + next possible flight
                 pass
 
 
