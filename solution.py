@@ -13,7 +13,7 @@ class FlightSearch:
     def run(self):
         self.setup()
         self.fetch_flights()
-        self.find_flight(self.origin_airport, self.destination_airport)
+        self.find_flight()
         pprint(self.selected_flights)
 
     # Get the user input of Origin and Destination airport
@@ -42,18 +42,20 @@ class FlightSearch:
             self.all_flights = [dict(zip(headers, i)) for i in file_data]
 
     # TODO Get correct flights
-    def find_flight(self, origin, destination):
-        # Loops through flights and looks for a flight that fits both criteria (OA and DA)
+    def find_flight(self):
+        flights = []
         for flight in self.all_flights:
-            if flight["origin"] == origin and flight["destination"] == destination:
-                self.selected_flights.append(flight)
+            if flight["origin"] == self.origin_airport:
+                flights.append(flight)
 
-        # Loops through flights and looks for flight with correct OA
-        for flight in self.all_flights:
-            if flight["origin"] == origin:
-                self.selected_flights.append(flight)
-                # Get function where OA is DA of chosen flight
-                return self.find_flight(flight["destination"], destination)
+        for flight in flights:
+            if flight["destination"] == self.destination_airport:
+                self.selected_flights.append(
+                    {"flight": flight}
+                )
+            else:
+                #Get next possible flight
+                pass
 
 
 if __name__ == "__main__":
