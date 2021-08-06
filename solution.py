@@ -51,7 +51,7 @@ class FlightSearch:
         for flight in flights:
             if flight["destination"] == self.destination_airport:
                 self.selected_flights.append(
-                    {"flight": flight}
+                    {"flights": flight}
                 )
             else:
                 #Get next possible flight
