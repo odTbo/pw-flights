@@ -12,11 +12,10 @@ class FlightSearch:
 
     def run(self):
         self.setup()
-        self.fetch_flights()
         self.find_flight()
         pprint(self.selected_flights)
 
-    # Get the user input of Origin and Destination airport
+    # User input for Origin and Destination airport + import CSV Data
     def setup(self):
         print("[Flight Search] Enter flight details.")
 
@@ -32,6 +31,8 @@ class FlightSearch:
         # self.num_bags = str(input("\t(Optional)Number of bags: "))
         # if :
         #     raise Exception("")
+
+        self.fetch_flights()
 
     # Fetch flights from CSV to dict all_flights
     def fetch_flights(self):
