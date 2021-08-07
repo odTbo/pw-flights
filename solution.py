@@ -38,7 +38,7 @@ class FlightSearch:
     # Fetch flights from CSV to dict all_flights
     def fetch_flights(self):
         # Open flights data sheet
-        with open("example/example0.csv") as f:
+        with open("example/example1.csv") as f:
             file_data = csv.reader(f)
             headers = next(file_data)
             self.all_flights = [dict(zip(headers, i)) for i in file_data]
@@ -61,10 +61,11 @@ class FlightSearch:
                         flight_plan.append(flight)
                         if flight_plan not in self.selected_flights:
                             self.selected_flights.append(flight_plan)
-                            self.find_flight(self.origin_airport, self.destination_airport)
+                            flight_plan = []
+                            # self.find_flight(self.origin_airport, self.destination_airport)
 
                 elif flight not in flight_plan and flight["destination"] not in prohibited_routes:
-                    print(f"{flight['destination']},{prohibited_routes}")
+                    # print(f"{flight['destination']},{prohibited_routes}")
                     flight_plan.append(flight)
                     self.find_flight(flight["destination"], destination, flight_plan)
 
