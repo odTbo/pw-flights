@@ -3,6 +3,8 @@ from pprint import pprint
 
 
 class FlightSearch:
+    """FlightSearch takes input of Origin Airport and Destination Airport from user and finds all combinations of
+    possible flights """
     def __init__(self):
         self.all_flights = []
         self.selected_flights = []
@@ -16,8 +18,8 @@ class FlightSearch:
         pprint(self.selected_flights)
         print(len(self.selected_flights))
 
-    # User input for Origin and Destination airport + import CSV Data
     def setup(self):
+        """User input for Origin and Destination airport + import CSV Data"""
         print("[Flight Search] Enter flight details.")
 
         self.origin_airport = str(input("\tOrigin airport: ")).upper()
@@ -35,16 +37,17 @@ class FlightSearch:
 
         self.fetch_flights()
 
-    # Fetch flights from CSV to dict all_flights
     def fetch_flights(self):
+        """Fetch flights from CSV to dict all_flights"""
         # Open flights data sheet
-        with open("example/moj.csv") as f:
+        with open("example/example0.csv") as f:
             file_data = csv.reader(f)
             headers = next(file_data)
             self.all_flights = [dict(zip(headers, i)) for i in file_data]
 
     # TODO Get correct flights
     def find_flight(self, origin, destination, flight_plan=[]):
+        """Finds all possible flight combinations"""
 
         # Get airports that are already in planned flight
         prohibited_routes = set()
@@ -52,6 +55,7 @@ class FlightSearch:
             for flight in flight_plan:
                 prohibited_routes.add(flight['origin'])
                 prohibited_routes.add(flight['destination'])
+
         all_origins = [flight["origin"] for flight in self.all_flights]
 
         for flight in self.all_flights:
@@ -68,6 +72,7 @@ class FlightSearch:
                 # If we can continue, recursion takes flights destination as origin
                 elif flight["destination"] in all_origins and flight["destination"] not in prohibited_routes:
                     self.find_flight(flight["destination"], destination, flight_plan)
+                    flight_plan = []
 
                 # We can't continue with this flight and we drop it from the list
                 else:
