@@ -38,7 +38,7 @@ class FlightSearch:
     # Fetch flights from CSV to dict all_flights
     def fetch_flights(self):
         # Open flights data sheet
-        with open("example/example1.csv") as f:
+        with open("example/moj.csv") as f:
             file_data = csv.reader(f)
             headers = next(file_data)
             self.all_flights = [dict(zip(headers, i)) for i in file_data]
@@ -46,28 +46,32 @@ class FlightSearch:
     # TODO Get correct flights
     def find_flight(self, origin, destination, flight_plan=[]):
 
+        # Get airports that are already in planned flight
         prohibited_routes = set()
         if len(flight_plan) != 0:
             for flight in flight_plan:
                 prohibited_routes.add(flight['origin'])
                 prohibited_routes.add(flight['destination'])
+        all_origins = [flight["origin"] for flight in self.all_flights]
 
         for flight in self.all_flights:
 
             if flight["origin"] == origin:
+                flight_plan.append(flight)
 
+                # If destination of flight is final we need to end this plan
                 if flight["destination"] == destination:
-                    if flight not in flight_plan:
-                        flight_plan.append(flight)
-                        if flight_plan not in self.selected_flights:
-                            self.selected_flights.append(flight_plan)
-                            flight_plan = []
-                            # self.find_flight(self.origin_airport, self.destination_airport)
+                    if flight_plan not in self.selected_flights:
+                        self.selected_flights.append(flight_plan)
+                        flight_plan = []
 
-                elif flight not in flight_plan and flight["destination"] not in prohibited_routes:
-                    # print(f"{flight['destination']},{prohibited_routes}")
-                    flight_plan.append(flight)
+                # If we can continue, recursion takes flights destination as origin
+                elif flight["destination"] in all_origins and flight["destination"] not in prohibited_routes:
                     self.find_flight(flight["destination"], destination, flight_plan)
+
+                # We can't continue with this flight and we drop it from the list
+                else:
+                    flight_plan.pop()
 
 
 if __name__ == "__main__":
