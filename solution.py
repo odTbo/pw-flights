@@ -12,8 +12,9 @@ class FlightSearch:
 
     def run(self):
         self.setup()
-        self.find_flight()
+        self.find_flight(self.origin_airport, self.destination_airport)
         pprint(self.selected_flights)
+        print(len(self.selected_flights))
 
     # User input for Origin and Destination airport + import CSV Data
     def setup(self):
@@ -43,22 +44,29 @@ class FlightSearch:
             self.all_flights = [dict(zip(headers, i)) for i in file_data]
 
     # TODO Get correct flights
-    def find_flight(self):
-        flights = []
-        for flight in self.all_flights:
-            if flight["origin"] == self.origin_airport:
-                flights.append(flight)
+    def find_flight(self, origin, destination, flight_plan=[]):
 
-        for flight in flights:
-            # Single flight option
-            if flight["destination"] == self.destination_airport:
-                self.selected_flights.append(
-                    {"flights": flight}
-                )
-            # Flights with layovers
-            else:
-                # flight + next possible flight
-                pass
+        prohibited_routes = set()
+        if len(flight_plan) != 0:
+            for flight in flight_plan:
+                prohibited_routes.add(flight['origin'])
+                prohibited_routes.add(flight['destination'])
+
+        for flight in self.all_flights:
+
+            if flight["origin"] == origin:
+
+                if flight["destination"] == destination:
+                    if flight not in flight_plan:
+                        flight_plan.append(flight)
+                        if flight_plan not in self.selected_flights:
+                            self.selected_flights.append(flight_plan)
+                            self.find_flight(self.origin_airport, self.destination_airport)
+
+                elif flight not in flight_plan and flight["destination"] not in prohibited_routes:
+                    print(f"{flight['destination']},{prohibited_routes}")
+                    flight_plan.append(flight)
+                    self.find_flight(flight["destination"], destination, flight_plan)
 
 
 if __name__ == "__main__":
