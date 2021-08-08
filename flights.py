@@ -17,7 +17,7 @@ def correct_layover(flight_plan, flight_to_append):
         layover_time = departure_dt - arrival_dt
         hours = divmod(layover_time.total_seconds(), 3600)[0]
 
-        if hours in range(1, 6):
+        if hours in range(1, 7):
             return True
         else:
             return False
@@ -57,6 +57,7 @@ class FlightSearch:
 
     def setup(self):
         """User input for Origin and Destination airport + import CSV Data"""
+        # TODO Swap sys.argv for argparse module
         # Get arguments from console
         arguments = sys.argv[1:]
 
@@ -85,7 +86,6 @@ class FlightSearch:
             headers = next(file_data)
             self.all_flights = [dict(zip(headers, i)) for i in file_data]
 
-    # TODO Get correct flights
     def find_flight(self, origin, destination, flight_plan=[]):
         """Finds all possible flight combinations"""
 
@@ -121,6 +121,7 @@ class FlightSearch:
                         self.find_flight(flight["destination"], destination, flight_plan)
                         flight_plan.pop()
 
+    # TODO Output as proper json (somehow)
     def flights_to_json(self):
         """Creates json format from selected flights"""
 
