@@ -1,6 +1,7 @@
 import csv
 from datetime import datetime
 import time
+import sys
 from pprint import pprint
 
 
@@ -12,9 +13,9 @@ def correct_layover(flight_plan, flight_to_append):
         # flight_plan is empty so we can proceed to add flight_2 to flight_plan
         return True
     else:
-        arrival = datetime.strptime(previous_flight["arrival"], "%Y-%m-%dT%H:%M:%S")
-        departure = datetime.strptime(flight_to_append["departure"], "%Y-%m-%dT%H:%M:%S")
-        layover_time = departure - arrival
+        arrival_dt = datetime.strptime(previous_flight["arrival"], "%Y-%m-%dT%H:%M:%S")
+        departure_dt = datetime.strptime(flight_to_append["departure"], "%Y-%m-%dT%H:%M:%S")
+        layover_time = departure_dt - arrival_dt
         hours = divmod(layover_time.total_seconds(), 3600)[0]
         # print(hours)
 
@@ -24,48 +25,56 @@ def correct_layover(flight_plan, flight_to_append):
             return False
 
 
+def flight_duration(departure, arrival):
+    """Calculates the duration of the flight"""
+    arrival_dt = datetime.strptime(departure, "%Y-%m-%dT%H:%M:%S")
+    departure_dt = datetime.strptime(arrival, "%Y-%m-%dT%H:%M:%S")
+
+    duration = departure_dt - arrival_dt
+    divm = divmod(duration.total_seconds(), 3600)
+    hours = round(divm[0])
+    minutes = round(divmod(divm[1], 60)[0])
+    duration_string = f"{hours}:{minutes}:00"
+
+    return duration_string
+
+
 class FlightSearch:
     """FlightSearch takes input of Origin Airport and Destination Airport from user and finds all combinations of
     possible flights """
     def __init__(self):
         self.all_flights = []
         self.selected_flights = []
+        self.output_json = []
+        self.csv_file = ""
         self.origin_airport = ""
         self.destination_airport = ""
         # self.num_bags = ""
 
     def run(self):
         self.setup()
-        before = time.time()
         self.find_flight(self.origin_airport, self.destination_airport)
-        after = time.time()
-        pprint(self.selected_flights)
-        duration = after - before
-        print(f"Search took {duration}s")
+        self.flights_to_json()
+        print(self.output_json)
+
 
     def setup(self):
         """User input for Origin and Destination airport + import CSV Data"""
-        print("[Flight Search] Enter flight details.")
+        arguments = sys.argv
 
-        self.origin_airport = str(input("\tOrigin airport: ")).upper()
-        if len(self.origin_airport) == 0:
-            raise Exception("Origin airport expected.")
+        if len(arguments) != 4:
+            raise Exception("Wrong arguments input")
 
-        self.destination_airport = str(input("\tDestination airport: ")).upper()
-        if len(self.destination_airport) == 0:
-            raise Exception("Destination airport expected.")
-
-        # TODO Nmber of bags
-        # self.num_bags = str(input("\t(Optional)Number of bags: "))
-        # if :
-        #     raise Exception("")
+        self.csv_file = arguments[1]
+        self.origin_airport = arguments[2].upper()
+        self.destination_airport = arguments[3].upper()
 
         self.fetch_flights()
 
     def fetch_flights(self):
         """Fetch flights from CSV to dict all_flights"""
         # Open flights data sheet
-        with open("example/example3.csv") as f:
+        with open(f"{self.csv_file}") as f:
             file_data = csv.reader(f)
             headers = next(file_data)
             self.all_flights = [dict(zip(headers, i)) for i in file_data]
@@ -87,7 +96,7 @@ class FlightSearch:
 
             if flight["origin"] == origin:
 
-                # If destination of flight is final we need to end this plan
+                # If destination of flight is final either add flight_plan as selected or discard if already present
                 if flight["destination"] == destination:
                     if correct_layover(flight_plan, flight):
                         flight_plan.append(flight)
@@ -99,12 +108,29 @@ class FlightSearch:
                         else:
                             flight_plan.pop()
 
-                # If we can continue, recursion takes flights destination as origin
+                # If we can continue, recursion takes flight's destination as origin
                 elif flight["destination"] in all_origins and flight["destination"] not in prohibited_routes:
                     if correct_layover(flight_plan, flight):
                         flight_plan.append(flight)
                         self.find_flight(flight["destination"], destination, flight_plan)
                         flight_plan.pop()
+
+    def flights_to_json(self):
+        """Creates json format from selected flights"""
+
+        for flight_plan in self.selected_flights:
+            departure = flight_plan[0]["departure"]
+            arrival = flight_plan[len(flight_plan) - 1]["arrival"]
+
+            formatted = {
+                "flights": [flight for flight in flight_plan],
+                "bags_allowed": min([int(flight["bags_allowed"]) for flight in flight_plan]),
+                "destination": self.destination_airport,
+                "origin": self.origin_airport,
+                "total_price": sum([float(flight["base_price"]) for flight in flight_plan]),
+                "duration": flight_duration(departure, arrival)
+            }
+            self.output_json.append(formatted)
 
 
 if __name__ == "__main__":
