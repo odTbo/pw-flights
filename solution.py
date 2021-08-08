@@ -130,6 +130,9 @@ class FlightSearch:
             }
             self.output_json.append(formatted)
 
+        # Sort the final json from lowest to highest price
+        self.output_json.sort(key=lambda item: item["total_price"])
+
 
 if __name__ == "__main__":
     flight_search = FlightSearch()
