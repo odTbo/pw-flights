@@ -1,6 +1,5 @@
 import csv
 from datetime import datetime
-import time
 import sys
 from pprint import pprint
 
@@ -55,8 +54,7 @@ class FlightSearch:
         self.setup()
         self.find_flight(self.origin_airport, self.destination_airport)
         self.flights_to_json()
-        print(self.output_json)
-
+        pprint(self.output_json, sort_dicts=False)
 
     def setup(self):
         """User input for Origin and Destination airport + import CSV Data"""
