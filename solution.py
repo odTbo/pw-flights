@@ -16,7 +16,6 @@ def correct_layover(flight_plan, flight_to_append):
         departure_dt = datetime.strptime(flight_to_append["departure"], "%Y-%m-%dT%H:%M:%S")
         layover_time = departure_dt - arrival_dt
         hours = divmod(layover_time.total_seconds(), 3600)[0]
-        # print(hours)
 
         if hours in range(1, 6):
             return True
@@ -33,6 +32,7 @@ def flight_duration(departure, arrival):
     divm = divmod(duration.total_seconds(), 3600)
     hours = round(divm[0])
     minutes = round(divmod(divm[1], 60)[0])
+
     duration_string = f"{hours}:{minutes}:00"
 
     return duration_string
@@ -48,7 +48,6 @@ class FlightSearch:
         self.csv_file = ""
         self.origin_airport = ""
         self.destination_airport = ""
-        # self.num_bags = ""
 
     def run(self):
         self.setup()
@@ -58,14 +57,23 @@ class FlightSearch:
 
     def setup(self):
         """User input for Origin and Destination airport + import CSV Data"""
-        arguments = sys.argv
+        # Get arguments from console
+        arguments = sys.argv[1:]
 
-        if len(arguments) != 4:
+        if len(arguments) != 3:
             raise Exception("Wrong arguments input")
 
-        self.csv_file = arguments[1]
-        self.origin_airport = arguments[2].upper()
-        self.destination_airport = arguments[3].upper()
+        self.csv_file = arguments[0]
+        if ".csv" not in self.csv_file:
+            raise Exception("Include correct .csv file.")
+
+        self.origin_airport = arguments[1].upper()
+        if len(self.origin_airport) != 3:
+            raise Exception("Input correct airport code!")
+
+        self.destination_airport = arguments[2].upper()
+        if len(self.destination_airport) != 3:
+            raise Exception("Input correct airport code!")
 
         self.fetch_flights()
 
