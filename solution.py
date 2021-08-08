@@ -61,22 +61,27 @@ class FlightSearch:
         for flight in self.all_flights:
 
             if flight["origin"] == origin:
-                flight_plan.append(flight)
 
                 # If destination of flight is final we need to end this plan
                 if flight["destination"] == destination:
+                    flight_plan.append(flight)
                     if flight_plan not in self.selected_flights:
-                        self.selected_flights.append(flight_plan)
-                        flight_plan = []
+                        to_append = flight_plan[:]
+                        self.selected_flights.append(to_append)
+                        # pprint(self.selected_flights)
+                        flight_plan.pop()
+                    else:
+                        flight_plan.pop()
 
                 # If we can continue, recursion takes flights destination as origin
                 elif flight["destination"] in all_origins and flight["destination"] not in prohibited_routes:
+                    flight_plan.append(flight)
                     self.find_flight(flight["destination"], destination, flight_plan)
                     flight_plan = []
 
                 # We can't continue with this flight and we drop it from the list
-                else:
-                    flight_plan.pop()
+                # else:
+                #     flight_plan.pop()
 
 
 if __name__ == "__main__":
