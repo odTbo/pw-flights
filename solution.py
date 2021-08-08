@@ -1,5 +1,18 @@
 import csv
+from datetime import datetime
 from pprint import pprint
+
+
+def correct_layover(flight_1, flight_2):
+    arrival = datetime.strptime(flight_1["arrival"], "%Y-%m-%dT%H:%M:%S")
+    departure = datetime.strptime(flight_2["departure"], "%Y-%m-%dT%H:%M:%S")
+    layover = departure - arrival
+    hours = divmod(layover.total_seconds(), 3600)[0]
+
+    if hours in range(1, 6):
+        return True
+    else:
+        return False
 
 
 class FlightSearch:
@@ -65,11 +78,13 @@ class FlightSearch:
                 # If destination of flight is final we need to end this plan
                 if flight["destination"] == destination:
                     flight_plan.append(flight)
+
                     if flight_plan not in self.selected_flights:
-                        to_append = flight_plan[:]
-                        self.selected_flights.append(to_append)
-                        # pprint(self.selected_flights)
-                        flight_plan.pop()
+
+                            to_append = flight_plan[:]
+                            self.selected_flights.append(to_append)
+                            # pprint(self.selected_flights)
+                            flight_plan.pop()
                     else:
                         flight_plan.pop()
 
@@ -79,9 +94,6 @@ class FlightSearch:
                     self.find_flight(flight["destination"], destination, flight_plan)
                     flight_plan = []
 
-                # We can't continue with this flight and we drop it from the list
-                # else:
-                #     flight_plan.pop()
 
 
 if __name__ == "__main__":
