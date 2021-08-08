@@ -20,6 +20,6 @@ ZH665,ECV,RFZ,2021-09-01T12:10:00,2021-09-01T14:40:00,58,12,2
 HOW TO RUN:
 Simply run the script from command line followed by name of your csv file, code of origin airport and code of destination airport.
 
-examply:
+example:
 
 C:\Program files>python solution.py flights_dataset.csv YOT IUQ
