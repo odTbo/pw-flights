@@ -1,5 +1,6 @@
 import csv
 from datetime import datetime
+import time
 from pprint import pprint
 
 
@@ -15,7 +16,7 @@ def correct_layover(flight_plan, flight_to_append):
         departure = datetime.strptime(flight_to_append["departure"], "%Y-%m-%dT%H:%M:%S")
         layover_time = departure - arrival
         hours = divmod(layover_time.total_seconds(), 3600)[0]
-        print(hours)
+        # print(hours)
 
         if hours in range(1, 6):
             return True
@@ -35,9 +36,12 @@ class FlightSearch:
 
     def run(self):
         self.setup()
+        before = time.time()
         self.find_flight(self.origin_airport, self.destination_airport)
+        after = time.time()
         pprint(self.selected_flights)
-        print(len(self.selected_flights))
+        duration = after - before
+        print(f"Search took {duration}s")
 
     def setup(self):
         """User input for Origin and Destination airport + import CSV Data"""
@@ -61,7 +65,7 @@ class FlightSearch:
     def fetch_flights(self):
         """Fetch flights from CSV to dict all_flights"""
         # Open flights data sheet
-        with open("example/example0.csv") as f:
+        with open("example/example3.csv") as f:
             file_data = csv.reader(f)
             headers = next(file_data)
             self.all_flights = [dict(zip(headers, i)) for i in file_data]
@@ -91,7 +95,6 @@ class FlightSearch:
                         if flight_plan not in self.selected_flights:
                             to_append = flight_plan[:]
                             self.selected_flights.append(to_append)
-                            # pprint(self.selected_flights)
                             flight_plan.pop()
                         else:
                             flight_plan.pop()
@@ -101,7 +104,7 @@ class FlightSearch:
                     if correct_layover(flight_plan, flight):
                         flight_plan.append(flight)
                         self.find_flight(flight["destination"], destination, flight_plan)
-                        flight_plan = []
+                        flight_plan.pop()
 
 
 if __name__ == "__main__":
