@@ -3,16 +3,24 @@ from datetime import datetime
 from pprint import pprint
 
 
-def correct_layover(flight_1, flight_2):
-    arrival = datetime.strptime(flight_1["arrival"], "%Y-%m-%dT%H:%M:%S")
-    departure = datetime.strptime(flight_2["departure"], "%Y-%m-%dT%H:%M:%S")
-    layover = departure - arrival
-    hours = divmod(layover.total_seconds(), 3600)[0]
-
-    if hours in range(1, 6):
+def correct_layover(flight_plan, flight_to_append):
+    """Checks layover requirement of 1-6 hours between last flight(if there is any) and flight we want to append"""
+    try:
+        previous_flight = flight_plan[len(flight_plan) - 1]
+    except IndexError:
+        # flight_plan is empty so we can proceed to add flight_2 to flight_plan
         return True
     else:
-        return False
+        arrival = datetime.strptime(previous_flight["arrival"], "%Y-%m-%dT%H:%M:%S")
+        departure = datetime.strptime(flight_to_append["departure"], "%Y-%m-%dT%H:%M:%S")
+        layover_time = departure - arrival
+        hours = divmod(layover_time.total_seconds(), 3600)[0]
+        print(hours)
+
+        if hours in range(1, 6):
+            return True
+        else:
+            return False
 
 
 class FlightSearch:
@@ -77,23 +85,23 @@ class FlightSearch:
 
                 # If destination of flight is final we need to end this plan
                 if flight["destination"] == destination:
-                    flight_plan.append(flight)
+                    if correct_layover(flight_plan, flight):
+                        flight_plan.append(flight)
 
-                    if flight_plan not in self.selected_flights:
-
+                        if flight_plan not in self.selected_flights:
                             to_append = flight_plan[:]
                             self.selected_flights.append(to_append)
                             # pprint(self.selected_flights)
                             flight_plan.pop()
-                    else:
-                        flight_plan.pop()
+                        else:
+                            flight_plan.pop()
 
                 # If we can continue, recursion takes flights destination as origin
                 elif flight["destination"] in all_origins and flight["destination"] not in prohibited_routes:
-                    flight_plan.append(flight)
-                    self.find_flight(flight["destination"], destination, flight_plan)
-                    flight_plan = []
-
+                    if correct_layover(flight_plan, flight):
+                        flight_plan.append(flight)
+                        self.find_flight(flight["destination"], destination, flight_plan)
+                        flight_plan = []
 
 
 if __name__ == "__main__":
