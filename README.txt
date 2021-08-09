@@ -22,4 +22,4 @@ Simply run the script from command line followed by name of your csv file, code 
 
 example:
 
-C:\Program files>python solution.py flights_dataset.csv YOT IUQ
+C:\Program files>python flights.py flights_dataset.csv YOT IUQ

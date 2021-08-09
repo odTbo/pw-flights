@@ -57,6 +57,7 @@ class FlightSearch:
 
     def setup(self):
         """User input for Origin and Destination airport + import CSV Data"""
+
         # TODO Swap sys.argv for argparse module
         # Get arguments from console
         arguments = sys.argv[1:]
@@ -80,6 +81,7 @@ class FlightSearch:
 
     def fetch_flights(self):
         """Fetch flights from CSV to dict all_flights"""
+
         # Open flights data sheet
         with open(f"{self.csv_file}") as f:
             file_data = csv.reader(f)
