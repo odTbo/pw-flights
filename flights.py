@@ -1,5 +1,5 @@
 import csv
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
 import json
 
@@ -28,14 +28,10 @@ def flight_duration(departure, arrival):
     arrival_dt = datetime.strptime(departure, "%Y-%m-%dT%H:%M:%S")
     departure_dt = datetime.strptime(arrival, "%Y-%m-%dT%H:%M:%S")
 
-    duration = departure_dt - arrival_dt
-    divm = divmod(duration.total_seconds(), 3600)
-    hours = round(divm[0])
-    minutes = round(divmod(divm[1], 60)[0])
+    duration = (departure_dt - arrival_dt).total_seconds()
+    time = str(timedelta(seconds=duration))
 
-    duration_string = f"{hours}:{minutes}:00"
-
-    return duration_string
+    return time
 
 
 class FlightSearch:
