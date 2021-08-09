@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
 import sys
-from pprint import pprint
+import json
 
 
 def correct_layover(flight_plan, flight_to_append):
@@ -53,7 +53,7 @@ class FlightSearch:
         self.setup()
         self.find_flight(self.origin_airport, self.destination_airport)
         self.flights_to_json()
-        pprint(self.output_json, sort_dicts=False)
+        print(self.output_json)
 
     def setup(self):
         """User input for Origin and Destination airport + import CSV Data"""
@@ -121,7 +121,6 @@ class FlightSearch:
                         self.find_flight(flight["destination"], destination, flight_plan)
                         flight_plan.pop()
 
-    # TODO Output as proper json (somehow)
     def flights_to_json(self):
         """Creates json format from selected flights"""
 
@@ -141,6 +140,7 @@ class FlightSearch:
 
         # Sort the final json from lowest to highest price
         self.output_json.sort(key=lambda item: item["total_price"])
+        self.output_json = json.dumps(self.output_json)
 
 
 if __name__ == "__main__":
